@@ -37,4 +37,6 @@ go run .
 ***
 ### blog
 
+https://zenn.dev/link/comments/f201d416192fbe
+
 ***
