@@ -22,5 +22,6 @@ go run .
 ***
 ### blog
 
+https://zenn.dev/link/comments/48fb52bba262cc
 
 ***
