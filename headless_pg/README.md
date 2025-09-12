@@ -14,6 +14,8 @@ postgres GoLang , Headless CMS
 ***
 ### API document
 
+https://github.com/kuc-arc-f/golang_2ex/blob/main/headless_pg/document/api.md
+
 ***
 ### setup
 * .env
