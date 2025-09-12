@@ -121,14 +121,17 @@ func main() {
 
 	http.HandleFunc("/", helloHandler)
 
-	http.HandleFunc("/api/data/list", handler.ListTodosHandler)
+    http.HandleFunc("/api/admin/content_list", handler.AdminListHandler)
+    http.HandleFunc("/api/admin/data_list", handler.AdminDataList)
+
+    http.HandleFunc("/api/data/list", handler.ListTodosHandler)
 	http.HandleFunc("/api/data/create", handler.CreateTodoHandler)
 	http.HandleFunc("/api/data/delete", handler.DeleteTodoHandler)
 	http.HandleFunc("/api/data/update", handler.UpdateTodoHandler)
 	http.HandleFunc("/api/login", loginHandler)
 
 	http.HandleFunc("/login", loginPage)
-  http.HandleFunc("/logout", logoutHandler)
+    http.HandleFunc("/logout", logoutHandler)
 
 	fmt.Println("Server running on :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))

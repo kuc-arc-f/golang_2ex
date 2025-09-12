@@ -3,7 +3,8 @@ import React from 'react'
 
 
 import App from './App';
- 
+import { BrowserRouter } from 'react-router-dom'
+
 /*
 function App() {
   return(
@@ -12,6 +13,8 @@ function App() {
 }
 */
 ReactDOM.createRoot(document.getElementById('root')).render(
-    <App />
+    <BrowserRouter>
+        <App />
+    </BrowserRouter>
 )
 console.log('#createRoot')
