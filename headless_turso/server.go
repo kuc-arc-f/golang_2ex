@@ -119,7 +119,7 @@ func main() {
 	http.HandleFunc("/", helloHandler)
     //http.HandleFunc("/api/admin/content_list", handler.AdminListHandler)
     //http.HandleFunc("/api/admin/data_list", handler.AdminDataList)
-
+    http.HandleFunc("/api/data/getone", handler.GetoneTodosHandler)
     http.HandleFunc("/api/data/list", handler.ListTodosHandler)
 	http.HandleFunc("/api/data/create", handler.CreateTodoHandler)
 	http.HandleFunc("/api/data/update", handler.UpdateTodoHandler)

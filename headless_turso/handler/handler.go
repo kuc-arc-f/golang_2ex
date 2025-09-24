@@ -7,6 +7,7 @@ import(
 	"encoding/json"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -139,6 +140,86 @@ func CreateTodoHandler(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
     w.WriteHeader(http.StatusCreated)
     json.NewEncoder(w).Encode(todo)
+}
+
+/**
+*
+* @param
+*
+* @return
+*/
+func GetoneTodosHandler(w http.ResponseWriter, r *http.Request) {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file: %s", err)
+	}
+	apiKey := os.Getenv("API_KEY")
+	authHeader := r.Header.Get("Authorization")
+
+	fmt.Println("Authorization: %s\n", authHeader)
+  if apiKey != authHeader {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+	//fmt.Println("API_KEY:", apiKey)
+	if r.Method != "GET" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+  db, err := connectDB()
+  if err != nil {
+    log.Fatal(err)
+  }
+  defer db.Close()
+
+	//query-string
+	query := r.URL.Query()
+
+	content := query.Get("content")
+	id_str := query.Get("id")
+	log.Printf("id_str=%s\n", id_str)
+	// 数値に変換
+	id, err := strconv.ParseInt(id_str, 10, 64)
+	if err != nil {
+		http.Error(w, "id must be a number", http.StatusBadRequest)
+		return
+	}
+	log.Printf("id = %d\n", id)	
+	//fmt.Fprintf(w, "content=%s\n", content)
+
+	sql := fmt.Sprintf("SELECT id, data, created_at, updated_at FROM %s WHERE id =%d", content, id)
+
+	//fmt.Fprintf(w, "sql=%s\n", sql)
+	log.Printf("sql=%s\n", sql)
+
+	rows, err := db.Query(sql)
+	if err != nil {
+		log.Printf("Error querying todos: %v", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	var todos []Todo
+	for rows.Next() {
+		var todo Todo
+		var createdAt, updatedAt time.Time
+		err := rows.Scan(
+			&todo.ID, &todo.Data, 
+			&createdAt, &updatedAt,
+		)
+		if err != nil {
+			log.Printf("Error scanning todo: %v", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		todo.CreatedAt = createdAt.Format("2006-01-02 15:04:05")
+		todo.UpdatedAt = updatedAt.Format("2006-01-02 15:04:05")
+		todos = append(todos, todo)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(todos)
 }
 
 func ListTodosHandler(w http.ResponseWriter, r *http.Request) {
