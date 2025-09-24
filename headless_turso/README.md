@@ -13,6 +13,8 @@ GoLang Turso SDK , Headless CMS
 ***
 ### API document
 
+https://github.com/kuc-arc-f/golang_2ex/blob/main/headless_turso/document/api.md
+
 ***
 ### setup
 * .env
