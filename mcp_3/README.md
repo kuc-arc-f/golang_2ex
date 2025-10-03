@@ -43,4 +43,6 @@ go build
 ***
 ### blog
 
+https://zenn.dev/link/comments/ff4907d87d271f
+
 ***
