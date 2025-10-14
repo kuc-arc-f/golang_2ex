@@ -22,7 +22,7 @@ go mod init example.com/go-mcp-server-4
 go mod tidy
 
 go get github.com/tursodatabase/libsql-client-go/libsql
-gi build
+go build
 ```
 ***
 * settings.json , GEMINI-CLI
