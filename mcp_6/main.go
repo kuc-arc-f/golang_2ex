@@ -6,10 +6,12 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"sync"
 
   "example.com/go-remote-mcp-server6/models"
 	"example.com/go-remote-mcp-server6/handler"
+	"github.com/joho/godotenv"
 )
 
 
@@ -242,6 +244,18 @@ func (s *MCPServer) executeTool(name string, args map[string]interface{}) (strin
 
 // HTTP Handler
 func (s *MCPServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file: %s", err)
+	}
+	apiKey := os.Getenv("API_KEY")
+	authHeader := r.Header.Get("Authorization")
+
+	fmt.Println("Authorization: %s\n", authHeader)
+  if apiKey != authHeader {
+		http.Error(w, "error, Unauthorized", http.StatusUnauthorized)
+		return
+	}
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return

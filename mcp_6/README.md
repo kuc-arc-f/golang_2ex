@@ -14,6 +14,7 @@ GoLang remoto MCP Server , TURSO database
 * .env
 
 ```
+API_KEY=
 TURSO_DATABASE_URL = 
 TURSO_AUTH_TOKEN = 
 ```

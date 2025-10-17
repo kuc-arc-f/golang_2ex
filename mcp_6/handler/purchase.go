@@ -9,8 +9,8 @@ import (
 	"time"
 	"os"
 
-	"github.com/joho/godotenv"
 	"example.com/go-remote-mcp-server6/models"
+	"github.com/joho/godotenv"
 	_ "github.com/tursodatabase/libsql-client-go/libsql"
 )
 
