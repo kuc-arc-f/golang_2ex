@@ -86,6 +86,15 @@ func NewMCPServer() *MCPServer {
 		},
 	})
 		
+	server.RegisterTool(Tool{
+		Name:        "purchase_list",
+		Description: "購入品リストを、表示します。",
+		InputSchema: map[string]interface{}{
+			"type": "object",
+			"properties": map[string]interface{}{},
+			"required": []string{},
+		},
+	})	
 	
 	return server
 }
@@ -237,6 +246,13 @@ func (s *MCPServer) executeTool(name string, args map[string]interface{}) (strin
 
 		return fmt.Sprintf("name=%s , price= %d 円、登録しました。", name, price2), nil
 	
+	case "purchase_list":
+		log.Printf("# purchase_list-start")
+		result := handler.PurchaseListHnadler()
+		//log.Printf("result=%s" , result)
+
+		return fmt.Sprintf("%s", result), nil
+
 	default:
 		return "", fmt.Errorf("tool execution not implemented: %s", name)
 	}

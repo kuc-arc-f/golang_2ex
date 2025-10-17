@@ -84,7 +84,7 @@ func PurchaseHnadler(name string, price int64) {
 *
 * @return
 */
-func PurchaseListHnadler(writer *bufio.Writer, req models.JSONRPCRequest) {
+func PurchaseListHnadler() string {
 	db, err := connectDB()
 	if err != nil {
 		log.Fatal(err)
@@ -97,8 +97,7 @@ func PurchaseListHnadler(writer *bufio.Writer, req models.JSONRPCRequest) {
 	rows, err := db.Query(sql)
 	if err != nil {
 		log.Printf("Error querying todos: %v", err)
-		sendError(writer, req.ID, -32602, "error, InternalServerError")
-		return
+		return "error, InternalServerError"
 	}
 	defer rows.Close()
 
@@ -112,8 +111,7 @@ func PurchaseListHnadler(writer *bufio.Writer, req models.JSONRPCRequest) {
 		)
 		if err != nil {
 			log.Printf("Error scanning todo: %v", err)
-  		sendError(writer, req.ID, -32602, "error, InternalServerError")
-			return
+			return "error, InternalServerError"
 		}
 		todo.CreatedAt = createdAt.Format("2006-01-02 15:04:05")
 		todo.UpdatedAt = updatedAt.Format("2006-01-02 15:04:05")
@@ -123,21 +121,10 @@ func PurchaseListHnadler(writer *bufio.Writer, req models.JSONRPCRequest) {
 	jsonBytes, err := json.Marshal(todos)
 	if err != nil {
 			fmt.Println("JSON 変換エラー:", err)
-  		sendError(writer, req.ID, -32602, "error, json convert")
-			return
+			return "error, json convert"
 	}
 	jsonString := string(jsonBytes)
-
-	toolResult := models.ToolResult{
-		Content: []models.Content{
-			{
-				Type: "text",
-				Text: jsonString,
-			},
-		},
-	}
-
-	sendResponse(writer, req.ID, toolResult)
+	return jsonString
 }
 
 /**
