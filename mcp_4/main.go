@@ -114,7 +114,32 @@ func handleToolsList(writer *bufio.Writer, req models.JSONRPCRequest) {
 					},
 					Required: []string{},
 				},
+			},
+			{
+				Name:        "diary_add",
+				Description: "2行以降の 日記の記事、メモ を取得して。APIに送信します。",
+				InputSchema: InputSchema{
+					Type: "object",
+					Properties: map[string]Property{
+						"text": {
+							Type:        "string",
+							Description: "日記の記事",
+						},
+					},
+					Required: []string{"text"},
+				},
+			},
+			{
+				Name:        "diary_list",
+				Description: "日記 記事リストを、表示します。",
+				InputSchema: InputSchema{
+					Type: "object",
+					Properties: map[string]Property{
+					},
+					Required: []string{},
+				},
 			},			
+
 		},
 	}
 	sendResponse(writer, req.ID, tools)
@@ -140,6 +165,14 @@ func handleToolsCall(writer *bufio.Writer, req models.JSONRPCRequest) {
 		handler.PurchaseListHnadler(writer, req)
 		return
 	}
+	if params.Name == "diary_add" {
+		handler.DiaryAddHandler(writer, req)
+		return
+	}	
+	if params.Name == "diary_list" {
+		handler.DiaryListHnadler(writer, req)
+		return
+	}	
 
 }
 

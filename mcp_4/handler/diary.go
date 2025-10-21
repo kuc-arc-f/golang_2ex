@@ -2,7 +2,7 @@ package handler
 
 import (
 	"bufio"
-	"database/sql"
+	//"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -10,32 +10,8 @@ import (
 	//"os"
 
 	"example.com/go-mcp-server-4/models"
-	//"github.com/joho/godotenv"
 	_ "github.com/tursodatabase/libsql-client-go/libsql"
 )
-
-const TURSO_DATABASE_URL = ""
-const TURSO_AUTH_TOKEN = ""
-
-func connectDB() (*sql.DB, error) {
-  dbURL := TURSO_DATABASE_URL
-  authToken := TURSO_AUTH_TOKEN
-
-  if dbURL == "" || authToken == "" {
-      log.Fatal("TURSO_DATABASE_URL または TURSO_AUTH_TOKEN が設定されていません")
-  }
-
-  // 接続文字列にトークンを付与
-  fullURL := fmt.Sprintf("%s?authToken=%s", dbURL, authToken)
-  // DB 接続
-  db, err := sql.Open("libsql", fullURL)
-  if err != nil {
-      log.Fatalf("failed to open db: %v", err)
-  }
-  //defer db.Close()
-
-	return db, nil
-}
 
 /**
 *
@@ -43,13 +19,16 @@ func connectDB() (*sql.DB, error) {
 *
 * @return
 */
-func PurchaseHnadler(writer *bufio.Writer, req models.JSONRPCRequest) {
+func DiaryAddHandler(writer *bufio.Writer, req models.JSONRPCRequest) {
+	type DiaryRequest struct {
+			Text string `json:"text"`
+	}	
 	var params models.CallToolParams
 	if err := json.Unmarshal(req.Params, &params); err != nil {
 		sendError(writer, req.ID, -32602, "Invalid params")
 		return
 	}
-	var args models.PurchaseParams
+	var args DiaryRequest
 	if err := json.Unmarshal(params.Arguments, &args); err != nil {
 		sendError(writer, req.ID, -32602, "Invalid arguments")
 		return
@@ -68,7 +47,7 @@ func PurchaseHnadler(writer *bufio.Writer, req models.JSONRPCRequest) {
 	}
 	defer db.Close()
 
-	sql := "INSERT INTO item_price (data) VALUES (?)"
+	sql := "INSERT INTO mcp_diary (data) VALUES (?)"
 	log.Printf("sql= %s", sql)
 
 	result, err := db.Exec(sql, jsonString)
@@ -83,7 +62,7 @@ func PurchaseHnadler(writer *bufio.Writer, req models.JSONRPCRequest) {
 		Content: []models.Content{
 			{
 				Type: "text",
-				Text: fmt.Sprintf("購入情報\n品名: %s\n価格: %d円", args.Name, args.Price),
+				Text: fmt.Sprintf("登録しました。"),
 			},
 		},
 	}
@@ -98,14 +77,14 @@ func PurchaseHnadler(writer *bufio.Writer, req models.JSONRPCRequest) {
 *
 * @return
 */
-func PurchaseListHnadler(writer *bufio.Writer, req models.JSONRPCRequest) {
+func DiaryListHnadler(writer *bufio.Writer, req models.JSONRPCRequest) {
 	db, err := connectDB()
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
-	sql := "SELECT id, data, created_at, updated_at FROM item_price ORDER BY created_at DESC LIMIT 5"
+	sql := "SELECT id, data, created_at, updated_at FROM mcp_diary ORDER BY created_at DESC LIMIT 5"
 	log.Printf("sql= %s", sql)
 
 	rows, err := db.Query(sql)
@@ -152,39 +131,4 @@ func PurchaseListHnadler(writer *bufio.Writer, req models.JSONRPCRequest) {
 	}
 
 	sendResponse(writer, req.ID, toolResult)
-}
-
-/**
-*
-* @param
-*
-* @return
-*/
-func sendResponse(writer *bufio.Writer, id interface{}, result interface{}) {
-	resp := models.JSONRPCResponse{
-		JSONRPC: "2.0",
-		ID:      id,
-		Result:  result,
-	}
-	
-	data, _ := json.Marshal(resp)
-	writer.Write(data)
-	writer.WriteByte('\n')
-	writer.Flush()
-}
-
-func sendError(writer *bufio.Writer, id interface{}, code int, message string) {
-	resp := models.JSONRPCResponse{
-		JSONRPC: "2.0",
-		ID:      id,
-		Error: &models.RPCError{
-			Code:    code,
-			Message: message,
-		},
-	}
-	
-	data, _ := json.Marshal(resp)
-	writer.Write(data)
-	writer.WriteByte('\n')
-	writer.Flush()
 }
